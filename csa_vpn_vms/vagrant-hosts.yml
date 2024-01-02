@@ -1,0 +1,30 @@
+# vagrant_hosts.yml
+#
+# List of hosts to be created by Vagrant. For more information about the
+# possible settings, see the documentation at
+# <https://github.com/bertvv/ansible-skeleton>
+---
+
+- name: remoterouter
+  ip: 172.123.0.1
+  netmask: 255.255.255.0
+  auto_config: false
+  box: bento/debian-12.1
+  intnet: true
+  memory: 512
+  cpus: 1
+  forwarded_ports:
+    - host: 2270
+      guest: 22
+
+- name: remoteclient
+  ip: 172.123.0.2
+  netmask: 255.255.255.0
+  auto_config: false
+  box: bento/ubuntu-22.04
+  intnet: true
+  memory: 1024
+  cpus: 1
+  forwarded_ports:
+    - host: 2280
+      guest: 22

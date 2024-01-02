@@ -1,0 +1,44 @@
+#!/usr/sbin/nft -f
+
+# https://www.youtube.com/watch?v=v15ac5ssoco
+# watch -n 1 "nft -n list table inet filter"
+
+flush ruleset
+
+define IF_WAN = "eth0"
+define IF_SERVERS = "eth1"
+define IF_DMZ = "eth2"
+define IF_CLIENTS = "eth3"
+define IF_INTERNALS = { "eth1", "eth2", "eth3" }
+define NIC_IP = "192.168.100.253"
+# define LOCAL_INETW = { 172.30.0.0/16 }
+define FAKE_INETW = { 192.168.100.0/24 }
+
+table inet filter { # table <family> <table_name>
+   chain input {
+      type filter hook input priority 0
+      #policy drop
+      iif $IF_INTERNALS accept comment "allow local packets"
+      iif $IF_WAN tcp dport {ssh} counter accept comment "allow ssh"
+      iif $IF_WAN ip daddr 172.30.20.0/24 tcp dport {http, https} counter accept comment "allow http traffic to dmz" 
+      iif $IF_WAN ct state {established, related} counter accept comment "allow esablished wan packets"
+      iif $IF_WAN drop
+   }
+
+   chain forward {
+      type filter hook forward priority 0;
+      #policy drop
+      iif $IF_WAN oif $IF_INTERNALS ct state {established, related} counter accept comment "allow wan -> lan, est, rel"
+      
+      iif $IF_WAN oif $IF_INTERNALS counter accept comment "allow lan to wan"
+
+      iif $IF_WAN ip daddr 172.30.20.0/24 tcp dport {http} counter accept comment "forward http"
+
+      iif $IF_WAN drop
+
+   }
+
+   chain output {
+      type filter hook output priority 0;
+   }
+}
