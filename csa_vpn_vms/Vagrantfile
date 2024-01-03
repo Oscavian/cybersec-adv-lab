@@ -116,6 +116,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define 'remoterouter' do |node|
     node.vm.network "private_network", name: "vboxnet1", ip: "192.168.100.103"
   end
+
+  config.vm.define 'workathome' do |node|
+    node.vm.network "private_network", name: "vboxnet1", ip: "192.168.100.88"
+  end
 end
 
 # -*- mode: ruby -*-

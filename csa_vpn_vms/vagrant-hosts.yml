@@ -28,3 +28,12 @@
   forwarded_ports:
     - host: 2280
       guest: 22
+
+- name: workathome
+  ip: 192.168.100.88
+  netmask: 255.255.255.0
+  auto_config: true
+  box: bento/ubuntu-22.04
+  memory: 1024
+  cpus: 1
+  
