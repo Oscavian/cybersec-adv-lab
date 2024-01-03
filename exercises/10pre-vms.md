@@ -87,7 +87,7 @@ Debian: https://wiki.debian.org/NetworkConfiguration#A3_ways_to_configure_the_ne
 **remoterouter**
 
 ```shell
-# /etc/network/interfaces
+oskar@remoterouter:~$ cat /etc/network/interfaces
 # This file describes the network interfaces available on your system
 # and how to activate them. For more information, see interfaces(5).
 
@@ -97,20 +97,20 @@ source /etc/network/interfaces.d/*
 auto lo
 iface lo inet loopback
 
-# remote internal network
-auto eth0
+auto eth0 
 iface eth0 inet static
-        address 172.123.0.1
-        netmask 255.255.255.0
-
-# fake internet
+    address 192.168.100.103
+    netmask 255.255.255.0
+    gateway 192.168.100.254 # primary interface apparently has to define the default gateway
+    dns-nameservers 10.0.2.3
 
 auto eth1
 iface eth1 inet static
-      address 192.168.100.103
-      netmask 255.255.255.0
-      gateway 192.168.100.254
-      dns-nameservers 10.0.2.3
+    address 172.123.0.1
+    netmask 255.255.255.0
+
+
+post-up ip route add 172.30.0.0/16 via 192.168.100.253
 
 $ sudo systemctl restart networking
 ```
@@ -149,7 +149,7 @@ network:
 
 ### Routes
 
-At least the isprouter needs a static route to the remote network in order to route traffic back:
+At least the **isprouter** needs a static route to the remote network in order to route traffic back:
 
 ```shell
 # /etc/network/interfaces
@@ -162,6 +162,22 @@ $ /etc/init.d/network restart
 
 Routes `remote -> company`, `company -> remote` are not strictly necessary with the isprouter in place which knows all networks.
 
+**companyrouter**
+```sh
+sudo nmcli connection modify eth0 +ipv4.routes "172.123.0.0/24 192.168.100.103"
+```
+
+**remoterouter**
+```sh
+```shell
+# /etc/network/interfaces
+[...]
+post-up ip route add 172.123.0.0/24 via 192.168.100.103
+```
+```sh
+$ /etc/init.d/network restart
+```
+
 ## Network diagram
 
-![Diagram including remote network](../img/csa_diagram_v3.png)
+![Diagram including remote network](../img/csa_diagram_v3.1.png)

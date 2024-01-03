@@ -19,3 +19,7 @@ VBoxManage startvm database --type headless
 #VBoxManage startvm win10
 sleep 2
 VBoxManage startvm red --type headless
+sleep 2
+VBoxManage startvm remoterouter --type headless
+sleep 2
+VBoxManage startvm remoteclient --type headless
