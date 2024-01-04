@@ -52,7 +52,7 @@ def network_options(host)
 
   options[:mac] = host['mac'].gsub(/[-:]/, '') if host.key?('mac')
   options[:auto_config] = host['auto_config'] if host.key?('auto_config')
-  options[:virtualbox__intnet] = "remote"
+  options[:virtualbox__intnet] = host['intnet'] if host.key?('intnet')
   options
 end
 
@@ -120,6 +120,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define 'workathome' do |node|
     node.vm.network "private_network", name: "vboxnet1", ip: "192.168.100.88"
   end
+
 end
 
 # -*- mode: ruby -*-

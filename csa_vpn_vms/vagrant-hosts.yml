@@ -10,7 +10,7 @@
   netmask: 255.255.255.0
   auto_config: false
   box: bento/debian-12.1
-  intnet: true
+  intnet: "remote"
   memory: 512
   cpus: 1
   forwarded_ports:
@@ -22,7 +22,7 @@
   netmask: 255.255.255.0
   auto_config: false
   box: bento/ubuntu-22.04
-  intnet: true
+  intnet: "remote"
   memory: 1024
   cpus: 1
   forwarded_ports:
@@ -36,4 +36,12 @@
   box: bento/ubuntu-22.04
   memory: 1024
   cpus: 1
-  
+
+- name: wazuh
+  ip: 172.30.0.22
+  netmask: 255.255.255.0
+  box: bento/almalinux-9
+  auto_config: true
+  memory: 4096
+  cpus: 2
+  intnet: "servers"
