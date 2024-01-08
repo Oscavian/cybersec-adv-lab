@@ -112,7 +112,33 @@ sudo systemctl daemon-reload
 sudo systemctl enable wazuh-agent --now
 ```
 
-## Windows hosts
+## File integrity monitoring
+
+## Regulatory Compliance
+
+> Wazuh helps implement compliance requirements for regulatory compliance support and visibility. This is done by providing automation, improved security controls, log analysis, and incident response.
+>
+> The default Wazuh ruleset provides support for PCI DSS, HIPAA, NIST 800-53, TSC, and GDPR frameworks and standards. Wazuh rules and decoders are used to detect attacks, system errors, security misconfigurations, and policy violations.
+> -> https://documentation.wazuh.com/current/compliance/index.html
+
+
+
+## Threat hunting
+
+# Sysmon
+
+> Sysmon for Windows
+> 
+> Until now, we have only installed the Wazuh agents on Linux hosts. Now install the Wazuh agent on a Windows client machine: can you do the same as on the Linux machines?
+> 
+> There is a tool available from Microsoft that enhances Windows logging, called Sysmon. This tool enables us to gain more insight in what happens (or has happened) on a Windows machine, and thus allows us to find and track anomalies or threats. A Wazuh agent on Windows can be configured to process the Sysmon logs so that these can be monitored and processed by Wazuh.
+> 
+> Wazuh has a blogpost in which Sysmon is installed next to a Wazuh agent. Then, an attack is executed with Mimikatz. This attack should show up in your Wazuh server. Go through the blogpost and make sure you can simulate this yourself!
+> 
+> TIP: The primary goal of showing a working SIEM (wazuh) setup in this lab is proving that process create events, as well as PowerShell commands executed on the Windows workstation are succesfully registered and retrievable in Wazuh. 
+>
+
+## Wazuh agent on Windows
 
 > manual way: https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-windows.html
 
@@ -128,19 +154,32 @@ Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-4.7.1-
 net start WazuhSvc
 ```
 
+## Wazuh Sysmon integration
 
-# Sysmon
+> TODO finish documentation
 
 > https://wazuh.com/blog/learn-to-detect-threats-on-windows-by-monitoring-sysmon-events/
 
-> Sysmon for Windows
-> 
-> Until now, we have only installed the Wazuh agents on Linux hosts. Now install the Wazuh agent on a Windows client machine: can you do the same as on the Linux machines?
-> 
-> There is a tool available from Microsoft that enhances Windows logging, called Sysmon. This tool enables us to gain more insight in what happens (or has happened) on a Windows machine, and thus allows us to find and track anomalies or threats. A Wazuh agent on Windows can be configured to process the Sysmon logs so that these can be monitored and processed by Wazuh.
-> 
-> Wazuh has a blogpost in which Sysmon is installed next to a Wazuh agent. Then, an attack is executed with Mimikatz. This attack should show up in your Wazuh server. Go through the blogpost and make sure you can simulate this yourself!
-> 
->  
-> 
-> TIP: The primary goal of showing a working SIEM (wazuh) setup in this lab is proving that process create events, as well as PowerShell commands executed on the Windows workstation are succesfully registered and retrievable in Wazuh. 
+**Configure wazuh to collect sysmon event**
+- Copy configuration to `/var/ossec/etc/rules/local_rules.xml`:
+```xml
+<group name="windows, sysmon, sysmon_process-anomalies,">
+   <rule id="100000" level="12">
+     <if_group>sysmon_event1</if_group>
+     <field name="win.eventdata.image">mimikatz.exe</field>
+     <description>Sysmon - Suspicious Process - mimikatz.exe</description>
+   </rule>
+
+   <rule id="100001" level="12">
+     <if_group>sysmon_event8</if_group>
+     <field name="win.eventdata.sourceImage">mimikatz.exe</field>
+     <description>Sysmon - Suspicious Process mimikatz.exe created a remote thread</description>
+   </rule>
+
+   <rule id="100002" level="12">
+     <if_group>sysmon_event_10</if_group>
+     <field name="win.eventdata.sourceImage">mimikatz.exe</field>
+     <description>Sysmon - Suspicious Process mimikatz.exe accessed $(win.eventdata.targetImage)</description>
+   </rule>
+</group>
+```

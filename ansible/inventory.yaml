@@ -1,0 +1,36 @@
+---
+linux_hosts:
+    vars:
+        ansible_become: true
+        ansible_ssh_user: oskar
+        ansible_host_key_checking: false
+        ansible_ssh_private_key_file: /home/oskar/.ssh/id_ansible
+    hosts:
+        companyrouter:
+            ansible_host: localhost
+        web:
+            ansible_host: 172.30.20.10
+        database:
+            ansible_host: 172.30.0.15
+        wazuh:
+            ansible_host: 172.30.0.22
+        remoterouter:
+            ansible_host: 172.123.0.1
+        remoteclient:
+            ansible_host: 172.123.0.2
+        workfromhome:
+            ansible_host: 192.168.100.88
+
+windows_hosts:
+    vars:
+        ansible_user: vagrant
+        ansible_password: vagrant
+        ansible_connection: winrm
+        ansible_winrm_server_cert_validation: ignore
+    hosts:
+        win10:
+            ansible_host: 172.30.100.101
+        dc:
+            ansible_host: 172.30.0.4
+
+        

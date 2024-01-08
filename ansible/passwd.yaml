@@ -1,0 +1,9 @@
+---
+- name: Fetch passwd files
+  hosts: linux_hosts
+  tasks:
+    - name: Copy /etc/passwd file
+      ansible.builtin.fetch:
+        src: /etc/passwd
+        dest: "./passwd/passwd_{{ inventory_hostname }}"
+        flat: true
