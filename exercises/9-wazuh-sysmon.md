@@ -156,11 +156,65 @@ net start WazuhSvc
 
 ## Wazuh Sysmon integration
 
-> TODO finish documentation
-
 > https://wazuh.com/blog/learn-to-detect-threats-on-windows-by-monitoring-sysmon-events/
 
+- download sysmon and extract the folder
+- create this configuration file and save it as `sysconfig.xml`
+```xml
+<Sysmon schemaversion="4.10">
+   <HashAlgorithms>md5</HashAlgorithms>
+   <EventFiltering>
+      <!--SYSMON EVENT ID 1 : PROCESS CREATION-->
+      <ProcessCreate onmatch="include">
+         <Image condition="contains">mimikatz.exe</Image>
+      </ProcessCreate>
+      <!--SYSMON EVENT ID 2 : FILE CREATION TIME RETROACTIVELY CHANGED IN THE FILESYSTEM-->
+      <FileCreateTime onmatch="include" />
+      <!--SYSMON EVENT ID 3 : NETWORK CONNECTION INITIATED-->
+      <NetworkConnect onmatch="include" />
+      <!--SYSMON EVENT ID 4 : RESERVED FOR SYSMON STATUS MESSAGES, THIS LINE IS INCLUDED FOR DOCUMENTATION PURPOSES ONLY-->
+      <!--SYSMON EVENT ID 5 : PROCESS ENDED-->
+      <ProcessTerminate onmatch="include" />
+      <!--SYSMON EVENT ID 6 : DRIVER LOADED INTO KERNEL-->
+      <DriverLoad onmatch="include" />
+      <!--SYSMON EVENT ID 7 : DLL (IMAGE) LOADED BY PROCESS-->
+      <ImageLoad onmatch="include" />
+      <!--SYSMON EVENT ID 8 : REMOTE THREAD CREATED-->
+      <CreateRemoteThread onmatch="include">
+         <SourceImage condition="contains">mimikatz.exe</SourceImage>
+      </CreateRemoteThread>
+      <!--SYSMON EVENT ID 9 : RAW DISK ACCESS-->
+      <RawAccessRead onmatch="include" />
+      <!--SYSMON EVENT ID 10 : INTER-PROCESS ACCESS-->
+      <ProcessAccess onmatch="include">
+         <SourceImage condition="contains">mimikatz.exe</SourceImage>
+      </ProcessAccess>
+      <!--SYSMON EVENT ID 11 : FILE CREATED-->
+      <FileCreate onmatch="include" />
+      <!--SYSMON EVENT ID 12 & 13 & 14 : REGISTRY MODIFICATION-->
+      <RegistryEvent onmatch="include" />
+      <!--SYSMON EVENT ID 15 : ALTERNATE DATA STREAM CREATED-->
+      <FileCreateStreamHash onmatch="include" />
+      <PipeEvent onmatch="include" />
+   </EventFiltering>
+</Sysmon>
+```
+
+- run this command to start sysmon
+```
+Sysmon64.exe -accepteula -i sysconfig.xml
+```
+
 **Configure wazuh to collect sysmon event**
+
+- Add this to your agents config file `ossec.conf`:
+```xml
+<localfile>
+  <location>Microsoft-Windows-Sysmon/Operational</location>
+  <log_format>eventchannel</log_format>
+</localfile>
+```
+
 - Copy configuration to `/var/ossec/etc/rules/local_rules.xml`:
 ```xml
 <group name="windows, sysmon, sysmon_process-anomalies,">
@@ -183,3 +237,8 @@ net start WazuhSvc
    </rule>
 </group>
 ```
+
+- restart the wazuh manager
+- restart the wazuh agent on windows
+
+![](../img/wazuh_mimikatz_detected.png)
