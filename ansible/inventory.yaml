@@ -23,14 +23,15 @@ linux_hosts:
 
 windows_hosts:
     vars:
-        ansible_user: vagrant
-        ansible_password: vagrant
+        ansible_user: ansible
+        ansible_password: ansible
         ansible_connection: winrm
+        ansible_winrm_transport: basic
+        ansible_winrm_scheme: http
+        ansible_port: 5985 # http port! https is 5986!
         ansible_winrm_server_cert_validation: ignore
     hosts:
         win10:
             ansible_host: 172.30.100.101
         dc:
             ansible_host: 172.30.0.4
-
-        
