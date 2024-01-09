@@ -171,3 +171,27 @@ sudo ettercap -Tq -i eth0 -M arp:remote /192.168.100.88// /192.168.100.253//
 - Ping webserver with VPN off and on and monitor in wireshark
 
 ![openvpn in wireshark](../img/openvpn_wireshark.png)
+
+
+## Resources
+
+
+- Certificates and certificate authorities (CA's)
+    https://www.youtube.com/watch?v=5rT6fZUwhG8
+    https://www.youtube.com/watch?v=stsWa9A3sOM
+    https://www.youtube.com/watch?v=T4Df5_cojAs (also explains what this has to do with HTTPS)
+    https://www.youtube.com/watch?v=kAaIYRJoJkc (also explains X.509)
+    https://www.youtube.com/watch?v=qXLD2UHq2vk (also explains CSR)
+- SSL/TLS
+    https://www.youtube.com/watch?v=j9QmMEWmcfo
+    https://www.youtube.com/watch?v=WfR3ZAP96mQ
+    https://www.youtube.com/watch?v=HMoFvRK4HUo (makes the link to SSL/TLS VPN's)
+    https://www.youtube.com/playlist?list=PLIFyRwBY_4bTwRX__Zn4-letrtpSj1mzY
+        Video 1, 2, 3, 4, 11, 12, 16
+    https://badssl.com/ (see what happens if SSL/TLS goes wrong)
+- PKI
+    https://easy-rsa.readthedocs.io/en/latest/intro-to-PKI/ (make sure you understand what easy-RSA's role is in the OpenVPN lab)
+- OpenVPN
+    https://sansorg.egnyte.com/dl/Ot6KgEYmLb (first 8 pages)
+- Extra: wireguard
+    https://www.wireguard.com
