@@ -1,0 +1,7 @@
+#!/usr/sbin/nft -f
+
+# Flush rules
+flush table inet filter
+
+# Delete tables
+delete table inet filter

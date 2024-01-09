@@ -1,0 +1,57 @@
+#!/usr/sbin/nft -f
+
+flush ruleset
+
+define IF_WAN = "eth0"
+define IF_SERVERS = "eth1"
+define IF_DMZ = "eth2"
+define IF_CLIENTS = "eth3"
+define IF_TUN = "tun0"
+define IF_INTERNALS = { "eth1", "eth2", "eth3" }
+define NIC_IP = "192.168.100.253"
+
+
+table ip filter {
+    chain input {
+        type filter hook input priority 0;
+        policy accept;
+
+        # Allow ssh access to router from host machine
+        iif $IF_WAN ip saddr 192.168.100.0 tcp dport ssh counter accept comment "Allow ssh from host system"
+
+        # accepting ping (icmp-echo-request) for diagnostic purposes.
+        iif $IF_WAN icmp type echo-request limit rate 5/second counter accept comment "Allow icmp echo-requests/pings to the router"
+
+        # Allow openvpn traffic (udp!)
+        iif $IF_WAN udp dport openvpn counter accept comment "Allow OpenVPN traffic"
+
+        # blocking all other incoming traffic from the fake internet
+        iif $IF_WAN ip saddr 192.168.100.0/24 counter drop comment "Block input traffic from"
+
+    }
+
+    chain forward {
+        type filter hook forward priority 0;
+        policy accept;
+
+        # Accept packets in established and related state coming back
+        iif $IF_WAN oif $IF_INTERNALS ct state {established, related} counter accept comment "allow wan -> lan, est, rel"
+        
+        # accepting ping (icmp-echo-request) for diagnostic purposes.
+        iif $IF_WAN oif $IF_DMZ icmp type echo-request limit rate 5/second counter accept comment "Allow icmp echo-requests/pings to the DMZ"
+
+        # allow access to webserver in dmz subnet
+        iif $IF_WAN oif $IF_DMZ ip daddr 172.30.20.10 tcp dport http counter accept comment "Allow http to dmz webserver"
+
+        # allow access to wazuh dashboard from host
+        iif $IF_WAN oif $IF_SERVERS ip saddr 192.168.100.0 ip daddr 172.30.0.22 tcp dport https counter accept comment "Allow Wazuh dashboard"
+
+        # blocking all other forwarded traffic from the fake internet
+        iif $IF_WAN ip saddr 192.168.100.0/24 counter drop comment "Block forwards from fake inet"
+
+    }
+
+    chain output {
+        type filter hook output priority 0;
+   }
+}
