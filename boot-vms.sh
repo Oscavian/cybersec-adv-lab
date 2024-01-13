@@ -15,8 +15,8 @@ sleep 2
 VBoxManage startvm web --type headless
 sleep 2
 VBoxManage startvm database --type headless
-#sleep 2
-#VBoxManage startvm win10
+sleep 2
+VBoxManage startvm win10
 sleep 2
 VBoxManage startvm red --type headless
 sleep 2
